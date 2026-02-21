@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Caccia al secondo indizio</title>
+
+  <style>
+    :root{
+      /* 🎨 Palette morbida e bambinesca (uguale al tuo stile definitivo) */
+      --ink:#243447;
+      --muted:#6b7c8c;
+
+      --primary:#4da3ff;        /* azzurro cielo */
+      --primarySoft:#dff1ff;
+
+      --accent:#ffd66b;         /* giallo burro */
+      --accentSoft:#fff6d9;
+
+      --mint:#8bd3c7;           /* verde menta tenue */
+
+      --card:#ffffff;
+      --border: rgba(36,52,71,.10);
+
+      --okBg:#e6f9f4;
+      --okInk:#0f766e;
+
+      --noBg:#fff1f2;
+      --noInk:#be123c;
+
+      --radius:22px;
+      --shadow:0 12px 28px rgba(0,0,0,.08);
+
+      --max:980px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--ink);
+      min-height:100vh;
+      background:#fefefe;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    /* 🌤 Sfondo morbido tipo quaderno */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background:
+        radial-gradient(800px 500px at 15% 10%, var(--primarySoft), transparent 60%),
+        radial-gradient(700px 400px at 85% 15%, var(--accentSoft), transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:22px 16px 50px;
+    }
+
+    header{
+      text-align:center;
+      margin-bottom:10px;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      background:var(--primarySoft);
+      border:1px solid rgba(77,163,255,.25);
+      color:#1e3a8a;
+      font-weight:800;
+      font-size:13px;
+    }
+
+    h1{
+      margin:14px 0 8px;
+      font-size:clamp(24px,6vw,40px);
+      line-height:1.1;
+    }
+
+    p.lead{
+      margin:0 auto;
+      max-width:70ch;
+      color:var(--muted);
+      font-size:15.5px;
+      line-height:1.55;
+    }
+
+    main{
+      margin-top:20px;
+      display:grid;
+      gap:20px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid var(--border);
+      overflow:hidden;
+    }
+
+    .card .hd{
+      padding:16px;
+      font-weight:900;
+      background:linear-gradient(135deg, var(--primarySoft), var(--accentSoft));
+      border-bottom:1px solid var(--border);
+    }
+
+    .card .bd{
+      padding:20px;
+      font-size:15px;
+      line-height:1.65;
+    }
+
+    .task{
+      margin-top:16px;
+      padding:14px;
+      border-radius:16px;
+      background:var(--accentSoft);
+      border:1px solid rgba(255,214,107,.4);
+      font-weight:800;
+      color:#92400e;
+    }
+
+    /* 🧩 Box labirinto */
+    .maze{
+      margin-top:18px;
+      padding:16px;
+      border-radius:20px;
+      background:#ffffff;
+      border:2px solid var(--mint);
+      box-shadow:0 8px 20px rgba(0,0,0,.05);
+    }
+
+    .maze img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:16px;
+      border:1px solid rgba(0,0,0,.06);
+      background:#fff;
+    }
+
+    .hint{
+      margin-top:12px;
+      color:var(--muted);
+      font-weight:700;
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .chip{
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f1f5f9;
+      border:1px solid rgba(0,0,0,.08);
+      font-size:14px;
+      font-weight:900;
+    }
+
+    label.title{
+      display:block;
+      margin-top:16px;
+      font-weight:900;
+    }
+
+    textarea, input[type="text"]{
+      width:100%;
+      margin-top:10px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(36,52,71,.15);
+      font-size:16px;
+      resize:vertical;
+      outline:none;
+      background:#fff;
+    }
+
+    textarea{ min-height:110px; }
+
+    textarea:focus, input[type="text"]:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(77,163,255,.15);
+    }
+
+    .btns{
+      margin-top:16px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      flex:1 1 160px;
+      min-height:46px;
+      border:none;
+      border-radius:16px;
+      font-weight:900;
+      cursor:pointer;
+      background:linear-gradient(180deg, var(--primary), #2f80ed);
+      color:white;
+      box-shadow:0 8px 18px rgba(77,163,255,.3);
+      transition:.12s ease;
+    }
+
+    button:hover{ transform:translateY(-2px); }
+
+    button.reset{
+      background:#f1f5f9;
+      color:#334155;
+      box-shadow:none;
+      border:1px solid rgba(0,0,0,.08);
+    }
+
+    .msg{
+      margin-top:16px;
+      padding:14px;
+      border-radius:16px;
+      font-weight:900;
+      display:none;
+    }
+
+    .ok{
+      display:block;
+      background:var(--okBg);
+      color:var(--okInk);
+    }
+
+    .no{
+      display:block;
+      background:var(--noBg);
+      color:var(--noInk);
+    }
+
+    .mapNote{
+      margin-top:16px;
+      padding:14px;
+      border-radius:16px;
+      background:var(--primarySoft);
+      border:1px solid rgba(77,163,255,.25);
+      font-weight:900;
+      color:#1e3a8a;
+    }
+
+    @media (min-width:760px){
+      .wrap{ padding:30px 24px 70px; }
+      button{ flex:0 0 auto; min-width:180px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">🗺️ Gioco a indizi • livello 2</div>
+      <h1>Caccia al secondo indizio</h1>
+      <p class="lead">
+        Aiuta i bambini a raggiungere l’uscita del labirinto. Lungo il percorso troverai alcune parole:
+        riscrivile nell’ordine in cui le incontrerai. Ti daranno la soluzione del secondo indizio.
+      </p>
+    </header>
+
+    <main>
+      <section class="card">
+        <div class="hd">🧩 Il labirinto</div>
+        <div class="bd">
+
+          <div class="maze">
+            <!-- 📌 Metti img.png nella stessa cartella di questo file -->
+            <img src="img.png" alt="Labirinto del secondo indizio" />
+            <div class="hint">
+              Segui il percorso fino alla chiesa e leggi le parole che incontri lungo la strada.
+            </div>
+
+            <div class="legend" aria-label="Suggerimento parole">
+              <span class="chip">Scrivi le parole in ordine</span>
+              <span class="chip">Poi forma la frase</span>
+            </div>
+          </div>
+
+          <label class="title" for="phrase">✅ Ora scrivi la frase completa:</label>
+          <input id="phrase" type="text" placeholder="Scrivi qui la frase..." autocomplete="off" />
+
+          <div class="mapNote">
+            Poi ricopia la frase nella <strong>casella del secondo indizio della mappa</strong>.
+          </div>
+
+          <label class="title" for="me">🧡 E tu? Come ti prepari per andare a Messa? Scrivilo qui sotto.</label>
+          <textarea id="me" placeholder="Io mi preparo così..."></textarea>
+
+          <div class="task">
+            Prova a invitare un amico per la prossima domenica!
+          </div>
+
+          <div class="btns">
+            <button id="checkBtn" type="button">Controlla</button>
+            <button class="reset" id="resetBtn" type="button">Ricomincia</button>
+          </div>
+
+          <div id="message" class="msg" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ✅ Soluzione del labirinto (dalle parole nell'immagine)
+    const SOL_WORDS = "MI PREPARO CON IMPEGNO ALLA MESSA";
+    const SOL_PHRASE = "MI PREPARO CON IMPEGNO ALLA MESSA";
+
+    function normalize(s){
+      return (s || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toUpperCase();
+    }
+
+    const phraseEl = document.getElementById("phrase");
+    const msg = document.getElementById("message");
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+        document.getElementById("checkBtn").addEventListener("click", () => {
+        const phraseOk = normalize(phraseEl.value) === SOL_PHRASE;
+
+        msg.style.display = "block";
+
+        if (phraseOk){
+            msg.className = "msg ok";
+            msg.textContent = "Bravissimo/a! 🎉 Hai trovato il secondo indizio!";
+        } else {
+            msg.className = "msg no";
+            msg.textContent = "Riprova 😊 Segui bene il percorso e scrivi la frase completa.";
+        }
+        });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      wordsEl.value = "";
+      phraseEl.value = "";
+      document.getElementById("me").value = "";
+      msg.style.display = "none";
+    });
+  </script>
+</body>
+</html>
